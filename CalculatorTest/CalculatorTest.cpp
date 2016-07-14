@@ -4,7 +4,7 @@
 #include "../Calculator/CalculatorNodeFactory.cpp"
 #include "../Calculator/CalculatorView.cpp"
 #include "../Calculator/Controller.cpp"
-#include "../Calculator/MathNodes.h"
+#include "../Calculator/MathNodes.cpp"
 #include <vector>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

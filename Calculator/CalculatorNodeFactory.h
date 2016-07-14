@@ -16,7 +16,6 @@ private:
 	void createSubtractionNode() const;
 	void createMultiplicationNode() const;
 	void createDivisionNode() const;
-	void finishNodeCreation(Node* i_newNode) const;
 
 	Calculator* m_calculator;
 };

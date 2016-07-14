@@ -40,18 +40,12 @@ void CalculatorNodeFactory::prepareNodeCreation(NodePriority i_priority, Node **
 	}
 }
 
-void CalculatorNodeFactory::finishNodeCreation(Node* i_newNode) const
-{
-	m_calculator->setMostRecentNode(i_newNode);
-	i_newNode->initNode();
-}
-
 void CalculatorNodeFactory::createAdditionNode() const
 {
 	Node *parent = m_calculator->getMostRecentNode(), *leftChild = parent;
 	prepareNodeCreation(NodePriority::PRIO_ADDITION, &parent, &leftChild);
 	Node* newNode = (Node*) new NodeAddition(parent, leftChild, (Node*) new NodeValue(0));
-	finishNodeCreation(newNode);
+	m_calculator->setMostRecentNode(newNode);
 }
 
 void CalculatorNodeFactory::createSubtractionNode() const
@@ -59,7 +53,7 @@ void CalculatorNodeFactory::createSubtractionNode() const
 	Node *parent = NULL, *leftChild = NULL;
 	prepareNodeCreation(NodePriority::PRIO_ADDITION, &parent, &leftChild);
 	Node* newNode = (Node*) new NodeSubtraction(parent, leftChild, (Node*) new NodeValue(0));
-	finishNodeCreation(newNode);
+	m_calculator->setMostRecentNode(newNode);
 }
 
 void CalculatorNodeFactory::createMultiplicationNode() const
@@ -67,7 +61,7 @@ void CalculatorNodeFactory::createMultiplicationNode() const
 	Node *parent = NULL, *leftChild = NULL;
 	prepareNodeCreation(NodePriority::PRIO_MULTIPLICATION, &parent, &leftChild);
 	Node* newNode = (Node*) new NodeMultiplication(parent, leftChild, (Node*) new NodeValue(0));
-	finishNodeCreation(newNode);
+	m_calculator->setMostRecentNode(newNode);
 }
 
 void CalculatorNodeFactory::createDivisionNode() const
@@ -75,6 +69,6 @@ void CalculatorNodeFactory::createDivisionNode() const
 	Node *parent = NULL, *leftChild = NULL;
 	prepareNodeCreation(NodePriority::PRIO_DIVISION, &parent, &leftChild);
 	Node* newNode = (Node*) new NodeDivision(parent, leftChild, (Node*) new NodeValue(0));
-	finishNodeCreation(newNode);
+	m_calculator->setMostRecentNode(newNode);
 }
 
