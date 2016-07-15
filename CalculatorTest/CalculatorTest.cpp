@@ -14,7 +14,7 @@ namespace CalculatorTest
 	TEST_CLASS(UnitTest1)
 	{
 	public:
-		TEST_METHOD(IntegrationTest_Controller_Calculator)
+		TEST_METHOD(IntegrationTest_SimpleCalculation)
 		{
 			CalculatorView* calculatorView = (CalculatorView*) new MockCalculatorView();
 			Calculator* calculator = new Calculator();
@@ -86,6 +86,24 @@ namespace CalculatorTest
 			Assert::AreEqual("1 * 2 / 0", calculator->getRootNode()->getDescription().c_str(), L"Unexpected description when replacing operation symbol");
 		}
 
+		TEST_METHOD(IntegrationTest_Brackets)
+		{
+			CalculatorView* calculatorView = (CalculatorView*) new MockCalculatorView();
+			Calculator* calculator = new Calculator();
+			Controller* controller = new Controller(*calculator, *calculatorView);
+			CalculatorNodeFactory* factory = new CalculatorNodeFactory(*calculator);
+
+			// contains one superfluous closing bracket that should just be dropped
+			const std::vector<char> fixedInput = { '(', '1', '-', '(', '2', '+', '3', ')', ')', '*', ')', '(', '4', '+', '5', ')' };
+			const std::string desc = "(1 - (2 + 3)) * (4 + 5)";
+			for (std::vector<char>::const_iterator it = fixedInput.begin(), end = fixedInput.end(); it != end; it++)
+			{
+				controller->handleInput(*it);
+			}
+			Assert::AreEqual(-36, calculator->calculateResult(), 0.001, L"Wrong result in calculator test");
+			Assert::AreEqual(desc, calculator->getRootNode()->getDescription(), L"Unexpected description for calculation");
+		}
+
 		TEST_METHOD(ValueNode_addDigit_toInt_Test)
 		{
 			Node* valueNode = (Node*) new NodeValue(3);
@@ -101,8 +119,26 @@ namespace CalculatorTest
 			valueNode->addDigit(0);
 			valueNode->addComma();
 			valueNode->addDigit(2);
+			valueNode->addComma(); // ignored
+			valueNode->addDigit(5);
 
-			Assert::AreEqual(30.2, valueNode->calculate(), L"Adding digits badly handled");
+			Assert::AreEqual(30.25, valueNode->calculate(), L"Adding digits badly handled");
+		}
+
+		TEST_METHOD(IntegrationTest_Priority_SubtractAdd)
+		{
+			CalculatorView* calculatorView = (CalculatorView*) new MockCalculatorView();
+			Calculator* calculator = new Calculator();
+			Controller* controller = new Controller(*calculator, *calculatorView);
+			CalculatorNodeFactory* factory = new CalculatorNodeFactory(*calculator);
+
+			const std::vector<char> fixedInput = { '2', '-', '3', '+', '4' };
+			for (std::vector<char>::const_iterator it = fixedInput.begin(), end = fixedInput.end(); it != end; it++)
+			{
+				controller->handleInput(*it);
+			}
+			Assert::AreEqual("2 - 3 + 4", calculator->getRootNode()->getDescription().c_str(), L"Unexpected description in calculator test");
+			Assert::AreEqual(3, calculator->calculateResult(), 0.001, L"Wrong result in calculator test");
 		}
 
 		TEST_METHOD(IntegrationTest_Priority_AddMultiply)

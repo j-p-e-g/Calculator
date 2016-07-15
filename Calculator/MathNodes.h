@@ -4,7 +4,8 @@
 
 enum NodePriority
 {
-	PRIO_ADDITION = 1, // also subtraction
+	PRIO_ADDITION = 1,
+	PRIO_SUBTRACTION,
 	PRIO_MULTIPLICATION,
 	PRIO_DIVISION,
 	PRIO_NONE
@@ -137,7 +138,7 @@ class NodeSubtraction : protected NodeOp
 public:
 	NodeSubtraction(Node *i_firstNode, Node *i_secondNode) : NodeSubtraction(NULL, i_firstNode, i_secondNode) {}
 
-	NodeSubtraction(Node* i_parentNode, Node *i_firstNode, Node *i_secondNode) : NodeOp(i_parentNode, i_firstNode, i_secondNode, NodePriority::PRIO_ADDITION, '-') {}
+	NodeSubtraction(Node* i_parentNode, Node *i_firstNode, Node *i_secondNode) : NodeOp(i_parentNode, i_firstNode, i_secondNode, NodePriority::PRIO_SUBTRACTION, '-') {}
 
 	double calculate() const;
 };
