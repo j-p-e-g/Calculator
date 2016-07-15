@@ -14,14 +14,32 @@ CalculatorNodeFactory::CalculatorNodeFactory(Calculator &i_calculator) :
 	m_calculator->addCommand('/', std::bind(&CalculatorNodeFactory::createDivisionNode, this));
 }
 
-// If the lastNode was an operation node and the second value is still zero,
-// replace the operation node with a new one
-void CalculatorNodeFactory::removeRecentEmptyOperationNode() const
+void CalculatorNodeFactory::createAdditionNode() const
 {
-	if (m_calculator->getMostRecentNode()->isEmpty())
-	{
-		m_calculator->removeRecentNode();
-	}
+	createAndLinkNodeOfType(NodePriority::PRIO_ADDITION);
+}
+
+void CalculatorNodeFactory::createSubtractionNode() const
+{
+	createAndLinkNodeOfType(NodePriority::PRIO_SUBTRACTION);
+}
+
+void CalculatorNodeFactory::createMultiplicationNode() const
+{
+	createAndLinkNodeOfType(NodePriority::PRIO_MULTIPLICATION);
+}
+
+void CalculatorNodeFactory::createDivisionNode() const
+{
+	createAndLinkNodeOfType(NodePriority::PRIO_DIVISION);
+}
+
+void CalculatorNodeFactory::createAndLinkNodeOfType(NodePriority i_nodeType) const
+{
+	Node *parent = NULL, *leftChild = NULL;
+	prepareNodeCreation(i_nodeType, &parent, &leftChild);
+	Node* newNode = createAndReturnNodeOfType(i_nodeType, parent, leftChild, (Node*) new NodeValue(0));
+	m_calculator->setMostRecentNode(newNode);
 }
 
 void CalculatorNodeFactory::prepareNodeCreation(NodePriority i_priority, Node **o_parentNode, Node **o_leftChild) const
@@ -40,35 +58,30 @@ void CalculatorNodeFactory::prepareNodeCreation(NodePriority i_priority, Node **
 	}
 }
 
-void CalculatorNodeFactory::createAdditionNode() const
+// If the lastNode was an operation node and the second value is still zero,
+// replace the operation node with a new one
+void CalculatorNodeFactory::removeRecentEmptyOperationNode() const
 {
-	Node *parent = NULL, *leftChild = NULL;
-	prepareNodeCreation(NodePriority::PRIO_ADDITION, &parent, &leftChild);
-	Node* newNode = (Node*) new NodeAddition(parent, leftChild, (Node*) new NodeValue(0));
-	m_calculator->setMostRecentNode(newNode);
+	if (m_calculator->getMostRecentNode()->isEmpty())
+	{
+		m_calculator->removeRecentNode();
+	}
 }
 
-void CalculatorNodeFactory::createSubtractionNode() const
+Node* CalculatorNodeFactory::createAndReturnNodeOfType(NodePriority i_nodeType, Node *i_parent, Node *i_leftChild, Node *i_rightChild) const
 {
-	Node *parent = NULL, *leftChild = NULL;
-	prepareNodeCreation(NodePriority::PRIO_SUBTRACTION, &parent, &leftChild);
-	Node* newNode = (Node*) new NodeSubtraction(parent, leftChild, (Node*) new NodeValue(0));
-	m_calculator->setMostRecentNode(newNode);
+	Node* newNode = NULL;
+	switch (i_nodeType)
+	{
+	case PRIO_ADDITION:
+		return (Node*) new NodeAddition(i_parent, i_leftChild, i_rightChild);
+	case PRIO_SUBTRACTION:
+		return (Node*) new NodeSubtraction(i_parent, i_leftChild, i_rightChild);
+	case PRIO_MULTIPLICATION:
+		return (Node*) new NodeMultiplication(i_parent, i_leftChild, i_rightChild);
+	case PRIO_DIVISION:
+		return (Node*) new NodeDivision(i_parent, i_leftChild, i_rightChild);
+	default:
+		_ASSERT(false, L"Unexpected node type*");
+	}
 }
-
-void CalculatorNodeFactory::createMultiplicationNode() const
-{
-	Node *parent = NULL, *leftChild = NULL;
-	prepareNodeCreation(NodePriority::PRIO_MULTIPLICATION, &parent, &leftChild);
-	Node* newNode = (Node*) new NodeMultiplication(parent, leftChild, (Node*) new NodeValue(0));
-	m_calculator->setMostRecentNode(newNode);
-}
-
-void CalculatorNodeFactory::createDivisionNode() const
-{
-	Node *parent = NULL, *leftChild = NULL;
-	prepareNodeCreation(NodePriority::PRIO_DIVISION, &parent, &leftChild);
-	Node* newNode = (Node*) new NodeDivision(parent, leftChild, (Node*) new NodeValue(0));
-	m_calculator->setMostRecentNode(newNode);
-}
-
